@@ -1,4 +1,4 @@
-Weighted Random for Python
+Drunk: Weighted Random for Python
 ==========================
 `wrandom` is a simple module that lets you
 make simple random operations with customizable

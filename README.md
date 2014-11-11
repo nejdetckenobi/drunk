@@ -1,10 +1,8 @@
 Drunk: Weighted Random for Python
-==========================
-`wrandom` is a simple module that lets you
-make simple random operations with customizable
-weights. It is dependent to built-in `random` module.
+=================================
+`drunk` is a simple module that lets you make simple random operations with
+customizable weights. It is dependent to built-in `random` module.
 
----
 ## Classes
 ###### `GeneticalOptimizer(initial_population, weight_key, breeding_function)`
 A basic implemention for genetical algorithms.
@@ -23,12 +21,12 @@ chromosome.
 
 
 ## Functions
-###### `wrandom.choice(bundle, weight_key)`
+###### `drunk.choice(bundle, weight_key)`
 Choses a random element from `bundle`.
 Weight for each element is calculated by the
 `weight_key`. `weight_key` should
 provide a positive `int` or a positive `float` value.
-###### `wrandom.shuffle(bundle, weight_key)`
+###### `drunk.shuffle(bundle, weight_key)`
 Creates a shuffled version of the `bundle`.
 `weight_key` calculates the weights.
 Assume `A` and `B` in `bundle`.
@@ -39,22 +37,22 @@ more frequently (that means weight).
 ---
 If you don't provide a `weight_key`;
 
-`wrandom.choice` will behave like `random.choice`
+`drunk.choice` will behave like `random.choice`
 
-`wrandom.shuffle` will behave like `random.shuffle`
+`drunk.shuffle` will behave like `random.shuffle`
 
 ## Examples
 **Choice example**:
 Here's a dummy class named `ABasicClass`,
 a list of some of its instances named `my_pretty_bundle`
 and a `weight_key` to calculate weights.
-`wrandom.choice` choses an element according to
+`drunk.choice` choses an element according to
 the weights which are calculated by
 an inline function.
 
 
 ```Python3
-import wrandom
+import drunk
 
 class ABasicClass(object)
 	def __init__(self, name, weight):
@@ -69,7 +67,7 @@ my_pretty_bundle.append(ABasicClass("Alpay", 30))
 my_pretty_bundle.append(ABasicClass("Gandalf", 20))
 my_pretty_bundle.append(ABasicClass("Kenobi", 10))
 
-choosen_one = wrandom.choice(my_pretty_bundle, lambda x: x.weight)
+choosen_one = drunk.choice(my_pretty_bundle, lambda x: x.weight)
 print("You picked ", choosen_one, "!!1!one!")
 ```
 
@@ -78,10 +76,10 @@ Here's an list named `my_pretty_list`.
 The weight of an element is its length.
 
 ```Python3
-import wrandom
+import drunk
 my_pretty_list = ["Doctor Who", "Banana", "Meh", "Apple"]
 
-print(wrandom.shuffle(my_pretty_list, weight_key=lambda x: len(x)))
+print(drunk.shuffle(my_pretty_list, weight_key=lambda x: len(x)))
 ```
 
 **Genetical Optimizer example**: Let there be a function _f_
@@ -93,10 +91,12 @@ Assume that `f(x) = -(x ** 2)` and `[a,b] = [1 , 5]`.
 We take the breeding function as `g(a, b) = (a + b) / 2`
 
 ```python
-from wrandom import GeneticalOptimizer
+from drunk import GeneticalOptimizer
 g = GeneticalOptimizer([1,5],
 					   lambda x: - (x ** 2),
 					   lambda a,b: (a+b)/2)
+# You can add more points if you wish. Like [1,2,3,5] but not larger than 5 and
+# not smaller than 1, because of our borders.
 
 g.generate(count=100, # 100 generation, not 100 breed! This means a lot.
 		   natural_selection=100) # Population capacity supports 100 fit breeds.

@@ -13,7 +13,12 @@ class InsufficientDataException(BaseException):
 
 class GeneticalOptimizer(object):
     """A genetical algorithm based simple optimizer class."""
-    def __init__(self, initial_population, weight_function, breeding_function):
+    def __init__(self,
+                 initial_population,
+                 weight_function,
+                 breeding_function,
+                 unit_breeds=2):
+
         super(GeneticalOptimizer, self).__init__()
         if len(initial_population) < 2:
             raise InsufficientDataException("Not enough unit to breed.")
@@ -21,16 +26,21 @@ class GeneticalOptimizer(object):
         self.weight_function = weight_function
         self.breeding_function = breeding_function
         self.initial_population = initial_population
-        self.population = initial_population[:]
+        self.population = [unit for unit in self.initial_population
+                           if self.weight_function(unit) > 0]
+        self.unit_breeds = unit_breeds
 
     def breed(self):
         """
         Creates a new member and adds it to population
         """
-        mom, dad = shuffle(self.population, self.weight_function)[:2]
+        parents = [choice(self.population, self.weight_function)
+                   for i in range(self.unit_breeds)]
 
-        child = self.breeding_function(mom, dad)
-        self.population.append(child)
+        child = self.breeding_function(parents)
+        if self.weight_function(child) > 0:
+            if child not in self.population:
+                self.population.append(child)
 
     def generate(self, count=None, natural_selection=None):
         """
@@ -40,6 +50,7 @@ class GeneticalOptimizer(object):
             count = random.randrange(0, len(self.population))
         for _ in range(count):
             self.breed()
+
         if isinstance(natural_selection, int):
             sorted_pop = sorted(self.population, key=self.weight_function)
             self.population = sorted_pop[:natural_selection]
@@ -55,8 +66,7 @@ def choice(bundle, weight_key=lambda x: 1):
     """
     Weighted random choice function.
     """
-    cumulative_list = []
-    cumulative_list.append(0)
+    cumulative_list = [0]
     summation = 0
     for element in bundle:
         summation += weight_key(element)
@@ -78,5 +88,5 @@ def shuffle(bundle, weight_key=lambda x: 1):
     while badcopy:
         choosen_one = choice(bundle=badcopy, weight_key=weight_key)
         result.append(choosen_one)
-        badcopy.remove(choosen_one)
+        badcopy.remove(choosen_one)  # bottleneck
     return result

@@ -54,7 +54,7 @@ an inline function.
 ```Python3
 import drunk
 
-class ABasicClass(object)
+class ABasicClass(object):
 	def __init__(self, name, weight):
 		self.name = name
 		self.weight = weight

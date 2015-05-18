@@ -62,7 +62,7 @@ class GeneticalOptimizer(object):
         return max(self.population, key=self.weight_function)
 
 
-def choice(bundle, weight_key=lambda x: 1):
+def choice(bundle, weight_key=lambda x: 1, with_index=False):
     """
     Weighted random choice function.
     """
@@ -76,6 +76,8 @@ def choice(bundle, weight_key=lambda x: 1):
     i = 0
     while cumulative_list[i] < random_num:
         i += 1
+    if with_index:
+        return {'value': bundle[i-1], 'index': i-1}
     return bundle[i-1]
 
 
@@ -86,7 +88,8 @@ def shuffle(bundle, weight_key=lambda x: 1):
     badcopy = bundle[:]
     result = []
     while badcopy:
-        choosen_one = choice(bundle=badcopy, weight_key=weight_key)
-        result.append(choosen_one)
-        badcopy.remove(choosen_one)  # bottleneck
+        choosen_one = choice(bundle=badcopy, weight_key=weight_key,
+                             with_index=True)
+        result.append(choosen_one['value'])
+        badcopy.pop(choosen_one['index'])
     return result

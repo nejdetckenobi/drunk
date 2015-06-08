@@ -120,7 +120,8 @@ g = GeneticalOptimizer([1,5],
 					   lambda x: - (x ** 2),
 					   lambda a,b: (a+b)/2)
 # You can add more points if you wish. Like [1,2,3,5] but not larger than 5 and
-# not smaller than 1. Because we set the borders [1, 5]. That will contradict with our borders.
+# not smaller than 1. Because we set the borders [1, 5].
+# That will contradict with our borders.
 
 g.generate(count=100, # 100 generation, not 100 breed! This means a lot.
 		   natural_selection=100) # Population capacity supports 100 fit breeds.

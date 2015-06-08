@@ -33,6 +33,11 @@ Assume `A` and `B` in `bundle`.
 If `A`'s weight greater than `B`'s,
 then you'll see `A` before `B` in the shuffled `bundle`,
 more frequently (that means weight).
+###### `drunk.sample(bundle, size, weight_key)`
+Gives a `size` sized sub-bundle of the bundle.
+`weight_key` calculates the weights.
+If `weight_key` returns a higher value for an element,
+The probability of chosing that element is also higher.
 
 ---
 If you don't provide a `weight_key`;
@@ -81,6 +86,25 @@ my_pretty_list = ["Doctor Who", "Banana", "Meh", "Apple"]
 
 print(drunk.shuffle(my_pretty_list, weight_key=lambda x: len(x)))
 ```
+
+**Sampling example**: Let there be a bundle. We want random 5 elements of it. There is also a `f` function that calculates the weight of each element in bundle. Let the weight of an element is itself.
+
+```Python3
+import drunk
+my_sexy_bundle = [1,  2, 3, 4]
+
+print(drunk.sample(my_pretty_list, weight_key=lambda x: x))
+```
+
+Or you can get some of that bundle which means a random sized sub-bundle.
+
+```Python3
+import drunk
+my_sexy_bundle = [1, 2, 3, 4]
+
+print(drunk.sample(my_pretty_list, weight_key=lambda x: x))
+```
+
 
 **Genetical Optimizer example**: Let there be a function _f_
 (which is actually a `weight_key`).

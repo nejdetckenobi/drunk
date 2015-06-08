@@ -57,7 +57,7 @@ class GeneticalOptimizer(object):
 
     def fittest(self):
         """
-        Returns the fittest of the population.
+        Returns the fittest member of the population.
         """
         return max(self.population, key=self.weight_function)
 
@@ -65,6 +65,8 @@ class GeneticalOptimizer(object):
 def choice(bundle, weight_key=lambda x: 1, with_index=False):
     """
     Weighted random choice function.
+    weight_key: A function that calculates the weight of each element in bundle
+    with_index: This is just for optimization. Using is not recommended.
     """
     cumulative_list = [0]
     summation = 0
@@ -84,10 +86,30 @@ def choice(bundle, weight_key=lambda x: 1, with_index=False):
 def shuffle(bundle, weight_key=lambda x: 1):
     """
     Weighted random shuffle function.
+    weight_key: A function that calculates the weight of each element in bundle
     """
     badcopy = bundle[:]
     result = []
     while badcopy:
+        choosen_one = choice(bundle=badcopy, weight_key=weight_key,
+                             with_index=True)
+        result.append(choosen_one['value'])
+        badcopy.pop(choosen_one['index'])
+    return result
+
+
+def sample(bundle, size=None, weight_key=lambda x: 1):
+    """
+    Weighted random sample function.
+    bundle: The iterative object that you want a sample from.
+    size: Size of the sample. If not given, it'll be a random value
+    weight_key: A function that calculates the weight of each element in bundle
+    """
+    if not size:
+        size = random.randrange(len(bundle))
+    badcopy = bundle[:]
+    result = []
+    for i in range(size):
         choosen_one = choice(bundle=badcopy, weight_key=weight_key,
                              with_index=True)
         result.append(choosen_one['value'])

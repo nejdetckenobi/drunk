@@ -1,7 +1,7 @@
 Drunk: Weighted Random for Python
 =================================
 `drunk` is a simple module that lets you make simple random operations with
-customizable weights. It is dependent to built-in `random` module.
+customizable weights. It depends to built-in `random` module.
 
 ## Classes
 ###### `GeneticalOptimizer(initial_population, weight_key, breeding_function)`

@@ -56,7 +56,7 @@ the weights which are calculated by
 an inline function.
 
 
-```Python3
+```python
 import drunk
 
 class ABasicClass(object):
@@ -80,7 +80,7 @@ print("You picked ", choosen_one, "!!1!one!")
 Here's an list named `my_pretty_list`.
 The weight of an element is its length.
 
-```Python3
+```python
 import drunk
 my_pretty_list = ["Doctor Who", "Banana", "Meh", "Apple"]
 
@@ -89,7 +89,7 @@ print(drunk.shuffle(my_pretty_list, weight_key=lambda x: len(x)))
 
 **Sampling example**: Let there be a bundle. We want random 5 elements of it. There is also a `f` function that calculates the weight of each element in bundle. Let the weight of an element is itself.
 
-```Python3
+```python
 import drunk
 my_sexy_bundle = [1,  2, 3, 4]
 
@@ -98,7 +98,7 @@ print(drunk.sample(my_pretty_list, weight_key=lambda x: x))
 
 Or you can get some of that bundle which means a random sized sub-bundle.
 
-```Python3
+```python
 import drunk
 my_sexy_bundle = [1, 2, 3, 4]
 

@@ -3,8 +3,8 @@ Drunk: Weighted Random for Python
 `drunk` is a simple module that lets you make simple random operations with
 customizable weights. It depends to built-in `random` module.
 
-## Classes
-###### `GeneticalOptimizer(initial_population, weight_key, breeding_function)`
+# Classes
+## `GeneticalOptimizer(initial_population, weight_key, breeding_function)`
 A basic implemention for genetical algorithms.
 
 `initial_population` is the startup population which should
@@ -19,21 +19,24 @@ to take a chromosome and must return a scalar value.
 to take 2 chromosome, crossover them and return the new
 chromosome.
 
+## `Dice(bundle, weight_key)`
+A basic implementation for picking an element from given bundle.
+This is faster than `drunk.choice` because it calculates cumulative weight only once (at object initialization). On the other hand, if you mutate the `bundle`, you should call `update_weights()` method of `Dice` object before using `choice` method.
 
-## Functions
-###### `drunk.choice(bundle, weight_key)`
+# Functions
+## `drunk.choice(bundle, weight_key)`
 Choses a random element from `bundle`.
 Weight for each element is calculated by the
 `weight_key`. `weight_key` should
 provide a positive `int` or a positive `float` value.
-###### `drunk.shuffle(bundle, weight_key)`
+## `drunk.shuffle(bundle, weight_key)`
 Creates a shuffled version of the `bundle`.
 `weight_key` calculates the weights.
 Assume `A` and `B` in `bundle`.
 If `A`'s weight greater than `B`'s,
 then you'll see `A` before `B` in the shuffled `bundle`,
 more frequently (that means weight).
-###### `drunk.sample(bundle, size, weight_key)`
+## `drunk.sample(bundle, size, weight_key)`
 Gives a `size` sized sub-bundle of the bundle.
 `weight_key` calculates the weights.
 If `weight_key` returns a higher value for an element,
@@ -46,7 +49,7 @@ If you don't provide a `weight_key`;
 
 `drunk.shuffle` will behave like `random.shuffle`
 
-## Examples
+# Examples
 **Choice example**:
 Here's a dummy class named `ABasicClass`,
 a list of some of its instances named `my_pretty_bundle`
@@ -134,3 +137,36 @@ if there is a solution. You can use it for iterable solutions more efficiently.
 But you should define the `weight_key` and the `breeding_function` properly.
 The system's success rate and performance depends on the `weight_key`'s
 definition.
+
+
+**Dice example**: Let there be a `bundle` and a `weight_key`.
+
+```python
+from drunk import Dice
+from collections import defaultdict
+bundle = ['red', 'blue', 'green']
+weights = [1, 2, 3]
+
+d = Dice(bundle, weight_key=lambda x: weights[bundle.index(x)])
+
+# Oops! I forgot to add an element. But I created Dice.
+# Let's update it before calling choice
+
+d.bundle.append('pumpkin')
+weights.append(4)
+d.update_weights()
+
+# Now we can test it by picking a lot.
+stats = defaultdict(int)
+
+for i in range(100000):
+    c = d.choice()
+    stats[c] += 1
+
+print(dict(stats))
+
+# I got these results. They're very accurate.
+# {'pumpkin': 39921, 'blue': 20109, 'red': 9961, 'green': 30009}
+```
+
+**Note:** Please use sorted data types for more accurate picking.

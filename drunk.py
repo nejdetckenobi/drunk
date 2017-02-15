@@ -13,12 +13,8 @@ class InsufficientDataException(BaseException):
 
 class GeneticalOptimizer(object):
     """A genetical algorithm based simple optimizer class."""
-    def __init__(self,
-                 initial_population,
-                 weight_function,
-                 breeding_function,
+    def __init__(self, initial_population, weight_function, breeding_function,
                  unit_breeds=2):
-
         super(GeneticalOptimizer, self).__init__()
         if len(initial_population) < 2:
             raise InsufficientDataException("Not enough unit to breed.")
@@ -60,6 +56,38 @@ class GeneticalOptimizer(object):
         Returns the fittest member of the population.
         """
         return max(self.population, key=self.weight_function)
+
+
+class Dice(object):
+    """
+    Weighted random choice object. Faster than choice function.
+    Because population cumulative_weight list is only calculated when
+    bundle changes.
+    """
+    def __init__(self, bundle, weight_key, with_index=False):
+        super(Dice, self).__init__()
+        self.bundle = bundle
+        self.weight_key = weight_key
+        self.with_index = with_index
+        self.cumulative_list = []
+        self.summation = 0
+        self.update_weights()
+
+    def update_weights(self):
+        self.cumulative_list = [0]
+        self.summation = 0
+        for element in self.bundle:
+            self.summation += self.weight_key(element)
+            self.cumulative_list.append(self.summation)
+
+    def choice(self, with_index=False):
+        random_num = random.random() * float(self.summation)
+        i = 0
+        while self.cumulative_list[i] < random_num:
+            i += 1
+        if with_index:
+            return {'value': self.bundle[i-1], 'index': i-1}
+        return self.bundle[i-1]
 
 
 def choice(bundle, weight_key=lambda x: 1, with_index=False):

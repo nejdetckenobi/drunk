@@ -3,6 +3,13 @@
 `drunk` is a simple module that lets you make simple random operations with
 customizable weights. It depends to built-in `random` module.
 
+## Installation
+
+Just install it via `pip`. It's compatible with 2.7 and 3.x versions of Python.
+
+> `pip install drunk`
+
+## Use
 
 ### `drunk.static_picker(bundle, weight_key)`
 
@@ -41,7 +48,7 @@ If you don't provide a `weight_key`;
 
 `drunk.shuffle` will behave like `random.shuffle`
 
-# Examples
+## Examples
 
 **`static_picker` example**:
 

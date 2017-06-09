@@ -1,42 +1,34 @@
-Drunk: Weighted Random for Python
-=================================
+# Drunk: Weighted Random for Python
+
 `drunk` is a simple module that lets you make simple random operations with
 customizable weights. It depends to built-in `random` module.
 
-# Classes
-## `GeneticalOptimizer(initial_population, weight_key, breeding_function)`
-A basic implemention for genetical algorithms.
 
-`initial_population` is the startup population which should
-be larger than 2 units. Otherwise, that'll cause an error
-named `InsufficientDataError`.
+### `drunk.static_picker(bundle, weight_key)`
 
-`weight_key` is a function that calculates a fit score
-for every single chromosome in the population. Must be able
-to take a chromosome and must return a scalar value.
+Creates a generator that chooses a random element from `bundle`
+Weight for each element is calculated by the
+`weight_key`. `weight_key` should
+provide a positive `int` or a positive `float` value.
 
-`breeding_function` is also a function which should be able
-to take 2 chromosome, crossover them and return the new
-chromosome.
+### `drunk.choice(bundle, weight_key)`
 
-## `Dice(bundle, weight_key)`
-A basic implementation for picking an element from given bundle.
-This is faster than `drunk.choice` because it calculates cumulative weight only once (at object initialization). On the other hand, if you mutate the `bundle`, you should call `update_weights()` method of `Dice` object before using `choice` method.
-
-# Functions
-## `drunk.choice(bundle, weight_key)`
 Choses a random element from `bundle`.
 Weight for each element is calculated by the
 `weight_key`. `weight_key` should
 provide a positive `int` or a positive `float` value.
-## `drunk.shuffle(bundle, weight_key)`
+
+### `drunk.shuffle(bundle, weight_key)`
+
 Creates a shuffled version of the `bundle`.
 `weight_key` calculates the weights.
 Assume `A` and `B` in `bundle`.
 If `A`'s weight greater than `B`'s,
 then you'll see `A` before `B` in the shuffled `bundle`,
 more frequently (that means weight).
-## `drunk.sample(bundle, size, weight_key)`
+
+### `drunk.sample(bundle, size, weight_key)`
+
 Gives a `size` sized sub-bundle of the bundle.
 `weight_key` calculates the weights.
 If `weight_key` returns a higher value for an element,
@@ -50,7 +42,23 @@ If you don't provide a `weight_key`;
 `drunk.shuffle` will behave like `random.shuffle`
 
 # Examples
-**Choice example**:
+
+**`static_picker` example**:
+
+```python
+import drunk
+
+my_pretty_bundle = ['Alpay', 'Gandalf', 'Kenobi', 'Amca']
+weight = lambda x: len(x)  # Assume that weights are related with the length
+
+picker = static_picker(my_pretty_bundle)
+
+choices = [next(picker) for i in range(10)]
+print(choices)  # returns a list filled with 10 picks.
+```
+
+**`choice` example**:
+
 Here's a dummy class named `ABasicClass`,
 a list of some of its instances named `my_pretty_bundle`
 and a `weight_key` to calculate weights.
@@ -94,7 +102,7 @@ print(drunk.shuffle(my_pretty_list, weight_key=lambda x: len(x)))
 
 ```python
 import drunk
-my_sexy_bundle = [1,  2, 3, 4]
+my_sexy_bundle = [1, 2, 3, 4]
 
 print(drunk.sample(my_pretty_list, weight_key=lambda x: x))
 ```
@@ -107,66 +115,3 @@ my_sexy_bundle = [1, 2, 3, 4]
 
 print(drunk.sample(my_pretty_list, weight_key=lambda x: x))
 ```
-
-
-**Genetical Optimizer example**: Let there be a function _f_
-(which is actually a `weight_key`).
-We wish to maximize that function in __[a,b]__.
-
-Assume that `f(x) = -(x ** 2)` and `[a,b] = [1 , 5]`.
-(We know the f's analytical optimum point in that borders.)
-We take the breeding function as `g(a, b) = (a + b) / 2`
-
-```python
-from drunk import GeneticalOptimizer
-g = GeneticalOptimizer([1,5],
-					   lambda x: - (x ** 2),
-					   lambda a,b: (a+b)/2)
-# You can add more points if you wish. Like [1,2,3,5] but not larger than 5 and
-# not smaller than 1. Because we set the borders [1, 5].
-# That will contradict with our borders.
-
-g.generate(count=100, # 100 generation, not 100 breed! This means a lot.
-		   natural_selection=100) # Population capacity supports 100 fit breeds.
-
-result = g.fittest()
-print(result) # prints the solution.
-```
-Note that genetical algorithms are applicable just for detecting
-if there is a solution. You can use it for iterable solutions more efficiently.
-But you should define the `weight_key` and the `breeding_function` properly.
-The system's success rate and performance depends on the `weight_key`'s
-definition.
-
-
-**Dice example**: Let there be a `bundle` and a `weight_key`.
-
-```python
-from drunk import Dice
-from collections import defaultdict
-bundle = ['red', 'blue', 'green']
-weights = [1, 2, 3]
-
-d = Dice(bundle, weight_key=lambda x: weights[bundle.index(x)])
-
-# Oops! I forgot to add an element. But I created Dice.
-# Let's update it before calling choice
-
-d.bundle.append('pumpkin')
-weights.append(4)
-d.update_weights()
-
-# Now we can test it by picking a lot.
-stats = defaultdict(int)
-
-for i in range(100000):
-    c = d.choice()
-    stats[c] += 1
-
-print(dict(stats))
-
-# I got these results. They're very accurate.
-# {'pumpkin': 39921, 'blue': 20109, 'red': 9961, 'green': 30009}
-```
-
-**Note:** Please use sorted data types for more accurate picking.

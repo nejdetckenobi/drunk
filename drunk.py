@@ -11,91 +11,46 @@ class InsufficientDataException(BaseException):
         super(InsufficientDataException, self).__init__()
 
 
-class GeneticalOptimizer(object):
-    """A genetical algorithm based simple optimizer class."""
-    def __init__(self, initial_population, weight_function, breeding_function,
-                 unit_breeds=2):
-        super(GeneticalOptimizer, self).__init__()
-        if len(initial_population) < 2:
-            raise InsufficientDataException("Not enough unit to breed.")
-
-        self.weight_function = weight_function
-        self.breeding_function = breeding_function
-        self.initial_population = initial_population
-        self.population = [unit for unit in self.initial_population
-                           if self.weight_function(unit) > 0]
-        self.unit_breeds = unit_breeds
-
-    def breed(self):
-        """
-        Creates a new member and adds it to population
-        """
-        parents = [choice(self.population, self.weight_function)
-                   for i in range(self.unit_breeds)]
-
-        child = self.breeding_function(parents)
-        if self.weight_function(child) > 0:
-            if child not in self.population:
-                self.population.append(child)
-
-    def generate(self, count=None, natural_selection=None):
-        """
-        Generates a new generation with a member count.
-        """
-        if not count:
-            count = random.randrange(0, len(self.population))
-        for _ in range(count):
-            self.breed()
-
-        if isinstance(natural_selection, int):
-            sorted_pop = sorted(self.population, key=self.weight_function)
-            self.population = sorted_pop[:natural_selection]
-
-    def fittest(self):
-        """
-        Returns the fittest member of the population.
-        """
-        return max(self.population, key=self.weight_function)
-
-
-class Dice(object):
+def static_picker(bundle, weight_key=lambda x: 1):
     """
-    Weighted random choice object. Faster than choice function.
-    Because population cumulative_weight list is only calculated when
-    bundle changes.
+    Weighted random choice generator for static bundles.
+    Does the same thing with but faster than 'choice' method.
+    Because weights are calculated only once.
+    In return, you cannot mutate the bundle.
+    It is simply a die. Returns a generator.
+
+    weight_key: A function that calculates the weight of each element in bundle
+
+    >>> b = [1, 2, 3]
+    >>> weight = lambda x: x ** 2  # Assume that weights are square values.
+    >>> g = static_picker(b)
+    >>> [next(g) for i in range(10)]
+    [1, 3, 1, 2, 3, 3, 1, 2, 3, 2]
     """
-    def __init__(self, bundle, weight_key, with_index=False):
-        super(Dice, self).__init__()
-        self.bundle = bundle
-        self.weight_key = weight_key
-        self.with_index = with_index
-        self.cumulative_list = []
-        self.summation = 0
-        self.update_weights()
-
-    def update_weights(self):
-        self.cumulative_list = [0]
-        self.summation = 0
-        for element in self.bundle:
-            self.summation += self.weight_key(element)
-            self.cumulative_list.append(self.summation)
-
-    def choice(self, with_index=False):
-        random_num = random.random() * float(self.summation)
+    bundle = bundle[:]
+    if not len(bundle):
+        raise InsufficientDataException('There is nothing in bundle to pick.')
+    cumulative_list = [0]
+    summation = 0
+    for element in bundle:
+        summation += weight_key(element)
+        cumulative_list.append(summation)
+    while True:
         i = 0
-        while self.cumulative_list[i] < random_num:
+        random_num = random.random() * float(summation)
+        while cumulative_list[i] < random_num:
             i += 1
-        if with_index:
-            return {'value': self.bundle[i-1], 'index': i-1}
-        return self.bundle[i-1]
+        yield cumulative_list[i]
 
 
-def choice(bundle, weight_key=lambda x: 1, with_index=False):
+def choice(bundle, weight_key=lambda x: 1):
     """
     Weighted random choice function.
     weight_key: A function that calculates the weight of each element in bundle
     with_index: This is just for optimization. Using is not recommended.
     """
+    if not len(bundle):
+        raise InsufficientDataException('There is nothing in bundle to pick.')
     cumulative_list = [0]
     summation = 0
     for element in bundle:
@@ -106,8 +61,6 @@ def choice(bundle, weight_key=lambda x: 1, with_index=False):
     i = 0
     while cumulative_list[i] < random_num:
         i += 1
-    if with_index:
-        return {'value': bundle[i-1], 'index': i-1}
     return bundle[i-1]
 
 
